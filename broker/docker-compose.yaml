@@ -1,0 +1,41 @@
+version: "3.7"
+
+services:
+  broker:
+    image: eclipse-mosquitto
+    container_name: mosquitto_broker
+    volumes:
+      - ./config:/mosquitto/config:rw
+      - ./data:/mosquitto/data:rw
+      - ./log:/mosquitto/log:rw
+    networks:
+      - localnet
+    ports:
+      - "1883:1883" #default mqtt port
+      - "9001:9001" #default mqtt port for websockets
+
+    restart: unless-stopped
+
+  node-red:
+    depends_on:
+      - broker
+    image: nodered/node-red:latest
+    volumes:
+      - "./node-red:/data"
+    user: "0"
+    networks:
+      - localnet
+    ports:
+      - "1880:1880"
+    environment:
+      - TZ=America/Sao_Paulo
+
+
+volumes:
+  mosquitto-config:
+  mosquitto-data:
+  mosquitto-log:
+  node-red-data:
+
+networks:
+  localnet:
