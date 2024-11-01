@@ -2,10 +2,10 @@ version: "3.7"
 
 services:
   broker:
-    image: eclipse-mosquitto
     container_name: mosquitto_broker
+    image: eclipse-mosquitto:1.6
     volumes:
-      - ./config:/mosquitto/config:rw
+      - ./config:/mosquitto/mosquitto.conf:rw
       - ./data:/mosquitto/data:rw
       - ./log:/mosquitto/log:rw
     networks:
@@ -13,8 +13,7 @@ services:
     ports:
       - "1883:1883" #default mqtt port
       - "9001:9001" #default mqtt port for websockets
-
-    restart: unless-stopped
+    restart: always
 
   node-red:
     depends_on:
@@ -22,7 +21,6 @@ services:
     image: nodered/node-red:latest
     volumes:
       - "./node-red:/data"
-    user: "0"
     networks:
       - localnet
     ports:
@@ -39,3 +37,6 @@ volumes:
 
 networks:
   localnet:
+    driver: bridge
+    driver_opts:
+          com.docker.network.enable_ipv6: "true"
